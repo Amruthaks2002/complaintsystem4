@@ -172,16 +172,25 @@
                             <i class="fas fa-clipboard-list mr-2"></i> Complaints
                         </h2>
                         <form method="GET" action="{{ route('cleaning.dashboard') }}" class="flex items-center space-x-2">
+    <!-- Department Filter -->
+    <select name="department_id" onchange="this.form.submit()" class="bg-white border rounded px-3 py-1">
+        <option value="">All Departments</option>
+        @foreach ($departments as $dept)
+            <option value="{{ $dept->id }}" {{ (isset($selectedDeptId) && $selectedDeptId == $dept->id) ? 'selected' : '' }}>
+                {{ $dept->name }}
+            </option>
+        @endforeach
+    </select>
 
-                            <select name="department_id" onchange="this.form.submit()" class="bg-white border rounded px-3 py-1">
-                                <option value="">All Departments</option>
-                                @foreach ($departments as $dept)
-                                    <option value="{{ $dept->id }}" {{ (isset($selectedDeptId) && $selectedDeptId == $dept->id) ? 'selected' : '' }}>
-                                        {{ $dept->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </form>
+    <!-- Status Filter -->
+    <select name="status" onchange="this.form.submit()" class="bg-white border rounded px-3 py-1">
+        <option value="">All Statuses</option>
+        <option value="pending" {{ (isset($selectedStatus) && $selectedStatus == 'pending') ? 'selected' : '' }}>Pending</option>
+        <option value="in progress" {{ (isset($selectedStatus) && $selectedStatus == 'in progress') ? 'selected' : '' }}>In Progress</option>
+        <option value="resolved" {{ (isset($selectedStatus) && $selectedStatus == 'resolved') ? 'selected' : '' }}>Resolved</option>
+    </select>
+</form>
+
                     </div>
                 </div>
 
@@ -222,7 +231,28 @@
                                 @endforeach
                             </tbody>
                         </table>
-                        <div class="mt-4">{{ $complaints->appends(request()->query())->links() }}</div>
+                        <div class="mt-6 flex justify-between items-center text-sm text-gray-600">
+    <!-- Show Total Complaints -->
+    <div>
+        Showing {{ $complaints->firstItem() ?? 0 }} to {{ $complaints->lastItem() ?? 0 }} of {{ $complaints->total() }} complaints
+    </div>
+
+    <!-- Show Only Previous and Next Buttons -->
+    <div class="flex space-x-2">
+        @if ($complaints->onFirstPage())
+            <span class="px-4 py-2 bg-gray-200 text-gray-500 rounded cursor-not-allowed">Previous</span>
+        @else
+            <a href="{{ $complaints->previousPageUrl() }}{{ request()->getQueryString() ? '&' . http_build_query(request()->except('page')) : '' }}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Previous</a>
+        @endif
+
+        @if ($complaints->hasMorePages())
+            <a href="{{ $complaints->nextPageUrl() }}{{ request()->getQueryString() ? '&' . http_build_query(request()->except('page')) : '' }}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Next</a>
+        @else
+            <span class="px-4 py-2 bg-gray-200 text-gray-500 rounded cursor-not-allowed">Next</span>
+        @endif
+    </div>
+</div>
+
                     </div>
                     @else
                         <div class="text-center py-8 text-gray-600">

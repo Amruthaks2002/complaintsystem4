@@ -12,20 +12,26 @@ use Illuminate\Http\Request;
 class CleaningController extends Controller
 {
     public function index(Request $request)
-    {
-        $departments = Department::all();
-        $selectedDeptId = $request->input('department_id');
+{
+    $departments = Department::all();
+    $selectedDeptId = $request->input('department_id');
+    $selectedStatus = $request->input('status');
 
-        $query = Complaint::with(['user', 'department'])->latest();
+    $query = Complaint::with(['user', 'department'])->latest();
 
-        if ($selectedDeptId) {
-            $query->where('department_id', $selectedDeptId);
-        }
-
-        $complaints = $query->paginate(10);
-
-        return view('cleaning.dashboard', compact('complaints', 'departments', 'selectedDeptId'));
+    if ($selectedDeptId) {
+        $query->where('department_id', $selectedDeptId);
     }
+
+    if ($selectedStatus) {
+        $query->where('status', $selectedStatus);
+    }
+
+    $complaints = $query->paginate(10)->appends($request->query());
+
+    return view('cleaning.dashboard', compact('complaints', 'departments', 'selectedDeptId', 'selectedStatus'));
+}
+
 
     public function showComplaint($id)
     {

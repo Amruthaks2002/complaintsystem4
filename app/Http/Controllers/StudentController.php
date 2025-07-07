@@ -62,19 +62,25 @@ class StudentController extends Controller
     }
 
     public function dashboard(Request $request)
-    {
-        $query = auth()->user()->complaints()
-            ->with('department')
-            ->orderBy('created_at', 'desc');
+{
+    $query = auth()->user()->complaints()
+        ->with('department')
+        ->orderBy('created_at', 'desc');
 
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        $complaints = $query->paginate(10);
-
-        return view('student.dashboard', compact('complaints'));
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
     }
+
+    if ($request->filled('department_id')) {
+        $query->where('department_id', $request->department_id);
+    }
+
+    $departments = \App\Models\Department::all(); 
+    $complaints = $query->paginate(10)->appends($request->query());
+
+    return view('student.dashboard', compact('complaints', 'departments'));
+}
+
 
     public function logout(Request $request)
     {
@@ -148,7 +154,6 @@ class StudentController extends Controller
             $query->orderBy('created_at', 'desc');
         }])->findOrFail($id);
 
-        // Check if the complaint belongs to the authenticated student
         if ($complaint->user_id != auth()->id()) {
             abort(403);
         }

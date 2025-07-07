@@ -139,7 +139,7 @@
                             <table class="w-full text-left">
                                 <thead>
                                     <tr class="text-slate-700 border-b border-gray-300">
-                                        <th class="p-3">#</th>
+                                        <th class="p-3">No</th>
                                         <th class="p-3">Student</th>
                                         <th class="p-3">Department</th>
                                         <th class="p-3">Title</th>

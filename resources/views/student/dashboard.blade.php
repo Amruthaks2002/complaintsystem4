@@ -176,14 +176,24 @@
                         <h2 class="text-xl font-bold">
                             <i class="fas fa-clipboard-list mr-2"></i> Your Complaints
                         </h2>
-                        <form method="GET" action="{{ route('student.dashboard') }}" class="flex items-center space-x-2">
-                            <select name="status" onchange="this.form.submit()" class="bg-white border rounded px-3 py-1">
-                                <option value="">All Statuses</option>
-                                <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
-                                {{-- <option value="in progress" {{ request('status') == 'in progress' ? 'selected' : '' }}>In Progress</option> --}}
-                                <option value="resolved" {{ request('status') == 'resolved' ? 'selected' : '' }}>Resolved</option>
-                            </select>
-                        </form>
+                        <form method="GET" action="{{ route('student.dashboard') }}" class="flex flex-wrap items-center space-x-2">
+    <select name="status" onchange="this.form.submit()" class="bg-white border rounded px-3 py-1">
+        <option value="">All Statuses</option>
+        <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+        <option value="resolved" {{ request('status') == 'resolved' ? 'selected' : '' }}>Resolved</option>
+    </select>
+
+    <select name="department_id" onchange="this.form.submit()" class="bg-white border rounded px-3 py-1">
+        <option value="">All Departments</option>
+        @foreach ($departments as $dept)
+            <option value="{{ $dept->id }}" {{ request('department_id') == $dept->id ? 'selected' : '' }}>
+                {{ $dept->name }}
+            </option>
+        @endforeach
+    </select>
+</form>
+
+                        
                     </div>
                 </div>
 
@@ -224,7 +234,28 @@
                                 @endforeach
                             </tbody>
                         </table>
-                        <div class="mt-4">{{ $complaints->links() }}</div>
+                        <div class="mt-6 flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
+    <div class="text-sm text-gray-600">
+        Showing {{ $complaints->firstItem() }} to {{ $complaints->lastItem() }} of {{ $complaints->total() }} complaints
+    </div>
+
+    <div class="pagination">
+        {{-- Previous Page Link --}}
+        @if ($complaints->onFirstPage())
+            <span class="px-4 py-2 bg-gray-200 text-gray-500 rounded cursor-not-allowed">Previous</span>
+        @else
+            <a href="{{ $complaints->previousPageUrl() }}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Previous</a>
+        @endif
+
+        {{-- Next Page Link --}}
+        @if ($complaints->hasMorePages())
+            <a href="{{ $complaints->nextPageUrl() }}" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Next</a>
+        @else
+            <span class="px-4 py-2 bg-gray-200 text-gray-500 rounded cursor-not-allowed">Next</span>
+        @endif
+    </div>
+</div>
+
                     </div>
                     @else
                         <div class="text-center py-8 text-gray-600">
